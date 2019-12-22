@@ -4,6 +4,8 @@ import { StyleSheet, SafeAreaView, View, Text, ScrollView, Picker } from 'react-
 import { Button, CheckBox } from 'react-native-elements'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
+import MultiSelect from 'react-native-multiple-select';
+
 //import RadioForm, { RadioButton, RadioButtonInput, RadioButtonLabel } from 'react-native-simple-radio-button';
 
 import { RadioGroup, RadioButton } from 'react-native-flexi-radio-button'
@@ -22,6 +24,19 @@ const options = [
   { value: 'bar', label: 'Bar' },
 ]
 
+const items = [
+  { id: '1', name: 'America' },
+  { id: '2', name: 'Argentina' },
+  { id: '3', name: 'Armenia' },
+  { id: '4', name: 'Australia' },
+  { id: '5', name: 'Austria' },
+  { id: '6', name: 'Azerbaijan' },
+  { id: '7', name: 'Argentina' },
+  { id: '8', name: 'Belarus' },
+  { id: '9', name: 'Belgium' },
+  { id: '10', name: 'Brazil' },
+];
+
 const validationSchema = Yup.object().shape({
   email: Yup.string()
     .label('Email')
@@ -38,6 +53,9 @@ const validationSchema = Yup.object().shape({
   city: Yup.string()
     .label('city')
     .required('Please Select city'),
+  skills: Yup.string()
+    .label('skills')
+    .required('Please Select Skills'),
 })
 
 
@@ -50,11 +68,15 @@ export default class Registration extends React.Component {
     this.state = {
       email: '',
       password: '',
-      text: '',
-      gender: ''
+      gender: '',
+      skills: [],
     }
   }
 
+  onSelectedItemsChange = skills => {
+    this.setState({ skills });
+    //Set Selected Items
+  };
 
   onLogin = async () => {
     const { email, password } = this.state
@@ -69,10 +91,11 @@ export default class Registration extends React.Component {
 
   goToSignup = () => this.props.navigation.navigate('Signup')
   render() {
+    const { skills } = this.state;
     return (
       <SafeAreaView style={styles.container}>
         <Formik
-          initialValues={{ email: '', password: '', check: false, gender: '', city: '' }}
+          initialValues={{ email: '', password: '', check: false, gender: '', city: '', skills: '' }}
           onSubmit={values => { alert(JSON.stringify(values)) }}
           validationSchema={validationSchema}
         >
@@ -80,6 +103,39 @@ export default class Registration extends React.Component {
             handleBlur, setFieldValue }) => (
               <Fragment>
                 <ScrollView>
+                  <SafeAreaView style={{ flex: 1 }}>
+                    <View style={{ flex: 1, padding: 30 }}>
+                      <MultiSelect
+                        name='skills'
+                        hideTags
+                        items={items}
+                        uniqueKey="id"
+                        ref={component => {
+                          this.multiSelect = component;
+                        }}
+                        onSelectedItemsChange={skills => {
+                          this.setState({ skills });
+                          setFieldValue('skills', skills)
+                        }}
+                        selectedItems={skills}
+                        selectText="Pick Skills"
+                        searchInputPlaceholderText="Search Items..."
+                        onChangeInput={text => console.log(text)}
+                        tagRemoveIconColor="#CCC"
+                        tagBorderColor="#CCC"
+                        tagTextColor="#CCC"
+                        selectedItemTextColor="#CCC"
+                        selectedItemIconColor="#CCC"
+                        itemTextColor="#000"
+                        displayKey="name"
+                        searchInputStyle={{ color: '#CCC' }}
+                        submitButtonColor="#48d22b"
+                        submitButtonText="Select Complete"
+                      />
+                    </View>
+                  </SafeAreaView>
+                  <ErrorMessage errorValue={touched.skills && errors.skills} />
+                  
                   <FormInput
                     name='email'
                     value={values.email}
@@ -141,6 +197,9 @@ export default class Registration extends React.Component {
                     <Picker.Item label="Mumbai" value="mumbai" />
                   </Picker>
                   <ErrorMessage errorValue={touched.city && errors.city} />
+
+
+
                   <View style={styles.buttonContainer}>
                     <FormButton
                       buttonType='outline'
