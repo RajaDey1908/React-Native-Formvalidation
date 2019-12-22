@@ -1,6 +1,6 @@
 //import {React, Fragment} from 'react'
 import React, { Component, Fragment } from 'react'
-import { StyleSheet, SafeAreaView, View, Text, ScrollView } from 'react-native'
+import { StyleSheet, SafeAreaView, View, Text, ScrollView, Picker } from 'react-native'
 import { Button, CheckBox } from 'react-native-elements'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
@@ -17,6 +17,11 @@ let radio_props = [
   { label: 'Female', value: 0 }
 ];
 
+const options = [
+  { value: 'foo', label: 'Foo' },
+  { value: 'bar', label: 'Bar' },
+]
+
 const validationSchema = Yup.object().shape({
   email: Yup.string()
     .label('Email')
@@ -30,6 +35,9 @@ const validationSchema = Yup.object().shape({
   gender: Yup.string()
     .label('gender')
     .required('Please Select Gender'),
+  city: Yup.string()
+    .label('city')
+    .required('Please Select city'),
 })
 
 
@@ -64,7 +72,7 @@ export default class Registration extends React.Component {
     return (
       <SafeAreaView style={styles.container}>
         <Formik
-          initialValues={{ email: '', password: '', check: false, gender: '' }}
+          initialValues={{ email: '', password: '', check: false, gender: '', city: '' }}
           onSubmit={values => { alert(JSON.stringify(values)) }}
           validationSchema={validationSchema}
         >
@@ -117,8 +125,22 @@ export default class Registration extends React.Component {
                       <Text>Female</Text>
                     </RadioButton>
                   </RadioGroup>
-
                   <ErrorMessage errorValue={touched.gender && errors.gender} />
+
+                  <Text> Select City</Text>
+                  <Picker
+                    selectedValue={this.state.language}
+                    style={{ height: 50, width: 100 }}
+                    onValueChange={(itemValue, itemIndex) => {
+                      setFieldValue('city', itemValue)
+                      this.setState({ language: itemValue })
+                    }}>
+                    <Picker.Item label=" " value=" " />
+                    <Picker.Item label="Kolkata" value="kolkata" />
+                    <Picker.Item label="Delhi" value="delhi" />
+                    <Picker.Item label="Mumbai" value="mumbai" />
+                  </Picker>
+                  <ErrorMessage errorValue={touched.city && errors.city} />
                   <View style={styles.buttonContainer}>
                     <FormButton
                       buttonType='outline'
