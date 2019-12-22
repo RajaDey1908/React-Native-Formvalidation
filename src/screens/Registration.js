@@ -14,15 +14,6 @@ import FormInput from '../components/FormInput'
 import FormButton from '../components/FormButton'
 import ErrorMessage from '../components/ErrorMessage'
 
-let radio_props = [
-  { label: 'Male', value: 0 },
-  { label: 'Female', value: 0 }
-];
-
-const options = [
-  { value: 'foo', label: 'Foo' },
-  { value: 'bar', label: 'Bar' },
-]
 
 const items = [
   { id: '1', name: 'America' },
@@ -37,15 +28,26 @@ const items = [
   { id: '10', name: 'Brazil' },
 ];
 
+const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
+
 const validationSchema = Yup.object().shape({
+  name: Yup.string()
+    .label('name')
+    .required('Please enter a Name'),
   email: Yup.string()
-    .label('Email')
+    .label('email')
     .email('Enter a valid email')
     .required('Please enter a registered email'),
   password: Yup.string()
-    .label('Password')
+    .label('password')
     .required()
-    .min(4, 'Password must have at least 4 characters '),
+    .min(4, 'password must have at least 4 characters '),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('password')], 'Confirm Password must matched Password')
+    .required('Confirm Password is required'),
+  phone: Yup.string().matches(phoneRegExp, 'Phone number is not valid')
+    .label('phone')
+    .required('Please enter a Phone Number'),
   check: Yup.boolean().oneOf([true], 'Please check the agreement'),
   gender: Yup.string()
     .label('gender')
@@ -58,16 +60,17 @@ const validationSchema = Yup.object().shape({
     .required('Please Select Skills'),
 })
 
-
-//import RadioForm, { RadioButton, RadioButtonInput, RadioButtonLabel } from 'react-native-simple-radio-button';
 export default class Registration extends React.Component {
 
 
   constructor() {
     super()
     this.state = {
+      name: '',
       email: '',
       password: '',
+      confirmPassword: '',
+      phone: '',
       gender: '',
       skills: [],
     }
@@ -95,7 +98,7 @@ export default class Registration extends React.Component {
     return (
       <SafeAreaView style={styles.container}>
         <Formik
-          initialValues={{ email: '', password: '', check: false, gender: '', city: '', skills: '' }}
+          initialValues={{ name: '', email: '', password: '', confirmPassword: '', phone: '', check: false, gender: '', city: '', skills: '' }}
           onSubmit={values => { alert(JSON.stringify(values)) }}
           validationSchema={validationSchema}
         >
@@ -103,8 +106,69 @@ export default class Registration extends React.Component {
             handleBlur, setFieldValue }) => (
               <Fragment>
                 <ScrollView>
+
+                  <FormInput
+                    name='name'
+                    value={values.name}
+                    onChangeText={handleChange('name')}
+                    placeholder='Enter Name'
+                    autoCapitalize='none'
+                    //iconName='envelope'
+                    //iconColor='#2C384A'
+                    onBlur={handleBlur('name')}
+                  />
+                  <ErrorMessage errorValue={touched.name && errors.name} />
+
+                  <FormInput
+                    name='email'
+                    value={values.email}
+                    onChangeText={handleChange('email')}
+                    placeholder='Enter email'
+                    autoCapitalize='none'
+                    // iconName='envelope'
+                    //iconColor='#2C384A'
+                    onBlur={handleBlur('email')}
+                  />
+                  <ErrorMessage errorValue={touched.email && errors.email} />
+
+                  <FormInput
+                    name='password'
+                    value={values.password}
+                    onChangeText={handleChange('password')}
+                    placeholder='Enter password'
+                    secureTextEntry
+                    // iconName='ios-lock'
+                    // iconColor='#2C384A'
+                    onBlur={handleBlur('password')}
+                  />
+                  <ErrorMessage errorValue={touched.password && errors.password} />
+
+                  <FormInput
+                    name='confirmPassword'
+                    value={values.confirmPassword}
+                    onChangeText={handleChange('confirmPassword')}
+                    placeholder='Enter Confirm Password'
+                    secureTextEntry
+                    // iconName='ios-lock'
+                    // iconColor='#2C384A'
+                    onBlur={handleBlur('confirmPassword')}
+                  />
+                  <ErrorMessage errorValue={touched.confirmPassword && errors.confirmPassword} />
+
+                  <FormInput
+                    name='phone'
+                    value={values.phone}
+                    onChangeText={handleChange('phone')}
+                    placeholder='Enter Phone Number'
+                    secureTextEntry
+                    // iconName='ios-lock'
+                    // iconColor='#2C384A'
+                    onBlur={handleBlur('phone')}
+                  />
+                  <ErrorMessage errorValue={touched.phone && errors.phone} />
+
                   <SafeAreaView style={{ flex: 1 }}>
-                    <View style={{ flex: 1, padding: 30 }}>
+                    <View style={{ flex: 1, padding: 15, }}>
                       <MultiSelect
                         name='skills'
                         hideTags
@@ -120,7 +184,6 @@ export default class Registration extends React.Component {
                         selectedItems={skills}
                         selectText="Pick Skills"
                         searchInputPlaceholderText="Search Items..."
-                        onChangeInput={text => console.log(text)}
                         tagRemoveIconColor="#CCC"
                         tagBorderColor="#CCC"
                         tagTextColor="#CCC"
@@ -135,29 +198,41 @@ export default class Registration extends React.Component {
                     </View>
                   </SafeAreaView>
                   <ErrorMessage errorValue={touched.skills && errors.skills} />
-                  
-                  <FormInput
-                    name='email'
-                    value={values.email}
-                    onChangeText={handleChange('email')}
-                    placeholder='Enter email'
-                    autoCapitalize='none'
-                    iconName='envelope'
-                    //iconColor='#2C384A'
-                    onBlur={handleBlur('email')}
-                  />
-                  <ErrorMessage errorValue={touched.email && errors.email} />
-                  <FormInput
-                    name='password'
-                    value={values.password}
-                    onChangeText={handleChange('password')}
-                    placeholder='Enter password'
-                    secureTextEntry
-                    iconName='ios-lock'
-                    iconColor='#2C384A'
-                    onBlur={handleBlur('password')}
-                  />
-                  <ErrorMessage errorValue={touched.password && errors.password} />
+
+                  <View style={styles.selectBox}>
+                    <Text > Select City</Text>
+                    <Picker
+                      selectedValue={this.state.language}
+                      style={{ flex: 1, padding: 20 }}
+                      onValueChange={(itemValue, itemIndex) => {
+                        setFieldValue('city', itemValue)
+                        this.setState({ language: itemValue })
+                      }}>
+                      <Picker.Item label=" " value=" " />
+                      <Picker.Item label="Kolkata" value="kolkata" />
+                      <Picker.Item label="Delhi" value="delhi" />
+                      <Picker.Item label="Mumbai" value="mumbai" />
+                    </Picker>
+                    <ErrorMessage errorValue={touched.city && errors.city} />
+                  </View>
+
+                  <View style={{ flex: 1, padding: 20 }}>
+                    <Text > Select Gender</Text>
+                    <RadioGroup
+                      onSelect={(index, value) => setFieldValue('gender', value)}
+                      onBlur={handleBlur('gender')}
+                      style={{ flex: 1, padding: 20, flexDirection: 'row' }}
+                    >
+                      <RadioButton value={'male'} >
+                        <Text>Male</Text>
+                      </RadioButton>
+                      <RadioButton value={'female'}>
+                        <Text>Female</Text>
+                      </RadioButton>
+                    </RadioGroup>
+                    <ErrorMessage errorValue={touched.gender && errors.gender} />
+                  </View>
+
                   <CheckBox
                     containerStyle={styles.checkBoxContainer}
                     checkedIcon="check-box"
@@ -170,41 +245,11 @@ export default class Registration extends React.Component {
                   />
                   <ErrorMessage errorValue={touched.check && errors.check} />
 
-                  <RadioGroup
-                    onSelect={(index, value) => setFieldValue('gender', value)}
-                    onBlur={handleBlur('gender')}
-                  >
-                    <RadioButton value={'male'} >
-                      <Text>Male</Text>
-                    </RadioButton>
-                    <RadioButton value={'female'}>
-                      <Text>Female</Text>
-                    </RadioButton>
-                  </RadioGroup>
-                  <ErrorMessage errorValue={touched.gender && errors.gender} />
-
-                  <Text> Select City</Text>
-                  <Picker
-                    selectedValue={this.state.language}
-                    style={{ height: 50, width: 100 }}
-                    onValueChange={(itemValue, itemIndex) => {
-                      setFieldValue('city', itemValue)
-                      this.setState({ language: itemValue })
-                    }}>
-                    <Picker.Item label=" " value=" " />
-                    <Picker.Item label="Kolkata" value="kolkata" />
-                    <Picker.Item label="Delhi" value="delhi" />
-                    <Picker.Item label="Mumbai" value="mumbai" />
-                  </Picker>
-                  <ErrorMessage errorValue={touched.city && errors.city} />
-
-
-
                   <View style={styles.buttonContainer}>
                     <FormButton
                       buttonType='outline'
                       onPress={handleSubmit}
-                      title='LOGIN'
+                      title='REGISTRATION'
                       buttonColor='#039BE5'
                       disabled={!isValid || isSubmitting}
                     />
@@ -214,14 +259,6 @@ export default class Registration extends React.Component {
             )
           }
         </Formik>
-        <Button
-          title="Don't have an account? Sign Up"
-          onPress={this.goToSignup}
-          titleStyle={{
-            color: '#F57C00'
-          }}
-          type="clear"
-        />
       </SafeAreaView>
     )
   }
@@ -230,9 +267,20 @@ export default class Registration extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    marginTop: 25,
   },
   buttonContainer: {
-    margin: 25
+    margin: 5
+  },
+  selectBox: {
+    flex: 1,
+    textAlign: "center",
+    justifyContent: "center",
+    padding: 15
+  },
+  checkBoxContainer:{
+    //padding:5
+    margin:10
   }
 })

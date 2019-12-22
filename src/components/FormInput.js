@@ -32,10 +32,10 @@ const FormInput = ({
 
 const styles = StyleSheet.create({
   inputContainer: {
-    margin: 15
+    margin: 0
   },
   iconStyle: {
-    marginRight: 10
+    marginRight: 5
   }
 })
 
