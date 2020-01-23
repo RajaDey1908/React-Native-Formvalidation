@@ -125,8 +125,8 @@ export default class Registration extends React.Component {
                     onChangeText={handleChange('email')}
                     placeholder='Enter email'
                     autoCapitalize='none'
-                    // iconName='envelope'
-                    //iconColor='#2C384A'
+                    iconName='envelope'
+                    iconColor='#2C384A'
                     onBlur={handleBlur('email')}
                   />
                   <ErrorMessage errorValue={touched.email && errors.email} />
@@ -269,6 +269,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     marginTop: 25,
+    margin:15
   },
   buttonContainer: {
     margin: 5
